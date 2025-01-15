@@ -1101,7 +1101,7 @@ int32_t CBitmap::GetIntFmt() const
 int32_t CBitmap::GetIntFmt() const { return 0; }
 #endif
 
-bool CBitmap::Load(std::string const& filename, float defaultAlpha, uint32_t reqChannel, uint32_t reqDataType, bool forceReplaceAlpha)
+bool CBitmap::Load(const std::string& filename, float defaultAlpha, uint32_t reqChannel, uint32_t reqDataType, bool forceReplaceAlpha)
 {
 	bool isLoaded = false;
 	bool isValid  = false;
@@ -1573,6 +1573,17 @@ bool CBitmap::SaveFloat(std::string const& filename) const
 
 	ilDeleteImages(1, &imageID);
 	return success;
+}
+
+
+bool CBitmap::SaveGrayFloatRaw(std::string const& filename) const
+{
+	const uint8_t* mem = GetRawMem();
+	if (!mem) return false;
+
+	std::ofstream file(filename, std::ios::binary);
+	file.write(reinterpret_cast<const char*>(mem), xsize*ysize*sizeof(float));
+	return true;
 }
 
 

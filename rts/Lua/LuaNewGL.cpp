@@ -5,6 +5,7 @@
 #include "Rendering/GL/myGL.h"
 #include "Rendering/GL/XBO.h"
 #include "Rendering/Textures/TextureFormat.h"
+#include "Rendering/Textures/Bitmap.h"
 #include "Rendering/Models/3DModelVAO.h"
 #include "LuaHandle.h"
 #include "LuaUtils.h"
@@ -14,6 +15,8 @@
 #include "Helpers/Sol.h"
 
 #include <utility>
+//!temp
+#include <fstream>
 
 
 ///////////////////////////////////////////////////////////////////
@@ -294,6 +297,25 @@ void SlotColorOps(GLuint slot, sol::optional<GLenum> rgbOp, sol::optional<GLenum
 
 
 /* Lua */
+void UploadTextureGrayFloatRaw(GLuint textureId, GLsizei width, GLsizei height, std::string filePath)
+{
+	//!temp
+	std::ifstream file(filePath, std::ios::in | std::ios::binary | std::ios::ate);
+	if (!file.is_open()) return;
+
+	size_t size = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	char* fileData = new char[size];
+	file.read(fileData, size);
+
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_FLOAT, fileData);
+	
+	delete[] fileData;
+}
+
+/* Lua */
 void InvalidateTexContents(GLuint textureId, GLint mip)
 {
 	glInvalidateTexImage(textureId, mip);
@@ -381,6 +403,22 @@ Sol::MultipleNumbers<4> ReadTexel(GLuint textureId, GLenum internalFormat, GLint
 }
 
 
+///////////////////////////////////////////////////////////////////
+//
+//  Images
+
+
+/* Lua */
+bool SaveImageGrayFloatRaw(GLsizei width, GLsizei height, std::string filePath)
+{
+	CBitmap bitmap;
+	bitmap.Alloc(width, height);
+	glReadPixels(0, 0, width, height, GL_RED, GL_FLOAT, bitmap.GetRawMem());
+
+	return bitmap.SaveGrayFloatRaw(filePath);
+}
+
+
 bool LuaNewGL::PushEntries(lua_State* L)
 {
 #if defined(__GNUG__) && defined(_DEBUG)
@@ -429,12 +467,15 @@ bool LuaNewGL::PushEntries(lua_State* L)
 		"SlotColorOp", &SlotColorOp,
 		"SlotColorOps", &SlotColorOps,
 
+		"UploadTextureGrayFloatRaw", &UploadTextureGrayFloatRaw,
 		"InvalidateTexContents", &InvalidateTexContents,
 		"ClearTexture", &ClearTexture,
 		"CopyTexture", &CopyTexture,
 		"GenTextureMips", &GenTextureMips,
 		"BindSampler", &BindSampler,
-		"ReadTexel", &ReadTexel
+		"ReadTexel", &ReadTexel,
+		
+		"SaveImageGrayFloatRaw", &SaveImageGrayFloatRaw
 	);
 
 #if defined(__GNUG__) && defined(_DEBUG)
