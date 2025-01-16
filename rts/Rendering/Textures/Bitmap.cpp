@@ -1576,7 +1576,7 @@ bool CBitmap::SaveFloat(std::string const& filename) const
 }
 
 
-bool CBitmap::SaveGrayFloatRaw(std::string const& filename) const
+bool CBitmap::SaveRawFloat(std::string const& filename) const
 {
 	const uint8_t* mem = GetRawMem();
 	if (!mem) return false;

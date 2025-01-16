@@ -52,7 +52,7 @@ public:
 	bool Save(const std::string& filename, bool opaque, bool logged = false, unsigned quality = 80) const;
 	bool SaveGrayScale(const std::string& filename) const;
 	bool SaveFloat(const std::string& filename) const;
-	bool SaveGrayFloatRaw(const std::string& filename) const;
+	bool SaveRawFloat(const std::string& filename) const;
 
 	bool Empty() const { return (memIdx == size_t(-1)); } // implies size=0
 

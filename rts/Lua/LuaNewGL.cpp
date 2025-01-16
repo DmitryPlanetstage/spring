@@ -297,7 +297,7 @@ void SlotColorOps(GLuint slot, sol::optional<GLenum> rgbOp, sol::optional<GLenum
 
 
 /* Lua */
-void UploadTextureGrayFloatRaw(GLuint textureId, GLsizei width, GLsizei height, std::string filePath)
+void UploadTextureRawFloat(GLuint textureId, GLsizei width, GLsizei height, std::string filePath)
 {
 	//!temp
 	std::ifstream file(filePath, std::ios::in | std::ios::binary | std::ios::ate);
@@ -409,13 +409,13 @@ Sol::MultipleNumbers<4> ReadTexel(GLuint textureId, GLenum internalFormat, GLint
 
 
 /* Lua */
-bool SaveImageGrayFloatRaw(GLsizei width, GLsizei height, std::string filePath)
+bool SaveImageRawFloat(GLsizei width, GLsizei height, std::string filePath)
 {
 	CBitmap bitmap;
 	bitmap.Alloc(width, height);
 	glReadPixels(0, 0, width, height, GL_RED, GL_FLOAT, bitmap.GetRawMem());
 
-	return bitmap.SaveGrayFloatRaw(filePath);
+	return bitmap.SaveRawFloat(filePath);
 }
 
 
@@ -467,7 +467,7 @@ bool LuaNewGL::PushEntries(lua_State* L)
 		"SlotColorOp", &SlotColorOp,
 		"SlotColorOps", &SlotColorOps,
 
-		"UploadTextureGrayFloatRaw", &UploadTextureGrayFloatRaw,
+		"UploadTextureRawFloat", &UploadTextureRawFloat,
 		"InvalidateTexContents", &InvalidateTexContents,
 		"ClearTexture", &ClearTexture,
 		"CopyTexture", &CopyTexture,
@@ -475,7 +475,7 @@ bool LuaNewGL::PushEntries(lua_State* L)
 		"BindSampler", &BindSampler,
 		"ReadTexel", &ReadTexel,
 		
-		"SaveImageGrayFloatRaw", &SaveImageGrayFloatRaw
+		"SaveImageRawFloat", &SaveImageRawFloat
 	);
 
 #if defined(__GNUG__) && defined(_DEBUG)
