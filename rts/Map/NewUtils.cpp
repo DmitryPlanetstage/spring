@@ -3,10 +3,11 @@
 #include "Map/MapDamage.h"
 #include "System/Log/ILog.h"
 #include <string>
+//!temp
+#include <fstream>
 
 namespace {
 	std::string HeightMapFilePath;
-	float HeightBase, HeightScale;
 
 	bool LoadHeightBitmap(CBitmap& bitmap, const char* filePath) {
 		if (!bitmap.LoadGrayscale(std::string(filePath), true)) {
@@ -23,18 +24,13 @@ namespace {
 	}
 }
 
-void SetHeightMapRequisites(const char* heightMapFilePath, float base, float scale) {
+void SetGameMapRequisites_(const char* heightMapFilePath) {
 	HeightMapFilePath = heightMapFilePath;
-	HeightBase = base;
-	HeightScale = scale;
 }
 
 // A bitmap must be 16-bit grayscale
-void SetHeightMapByBitmap(const CBitmap& bitmap, float heightBase, float heightScale, int fromX, int fromZ, int toX, int toZ) {
-	if (mapDamage->Disabled()) return;
-
-	HeightBase = heightBase;
-	HeightScale = heightScale;
+void SetHeightMapByBitmap(const CBitmap& bitmap, int fromX, int fromZ, int toX, int toZ) {
+	/*if (mapDamage->Disabled()) return;
 
 	const uint16_t* data = reinterpret_cast<const uint16_t*>(bitmap.GetRawMem());
 	bool heightMapChanged = false;
@@ -50,26 +46,56 @@ void SetHeightMapByBitmap(const CBitmap& bitmap, float heightBase, float heightS
 
 	if (heightMapChanged) {
 		mapDamage->RecalcArea(fromX, toX, fromZ, toZ);
-	}
+	}*/
 }
 
-void SetHeightMapByFile(const char* filePath, float heightBase, float heightScale, int fromX, int fromZ, int toX, int toZ) {
+void SetHeightMapByFile(const char* filePath, int fromX, int fromZ, int toX, int toZ) {
 	if (mapDamage->Disabled()) return;
 
-	CBitmap bitmap;
-	if (!LoadHeightBitmap(bitmap, filePath)) return;
+	//!temp
+	char* fileData;
+	{
+		std::ifstream file(HeightMapFilePath, std::ios::in | std::ios::binary | std::ios::ate);
+		if (!file.is_open()) return;
 
+		size_t size = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		fileData = new char[size];
+		file.read(fileData, size);
+	}
+
+	float* heights = reinterpret_cast<float*>(fileData);
+	bool heightMapChanged = false;
+	for (int z = fromZ; z <= toZ; ++z) {
+		for (int x = fromX; x <= toX; ++x) {
+			const int index = z*mapDims.mapxp1 +x;
+			const float height = heights[index];
+			const float oldHeight = readMap->GetCornerHeightMapSynced()[index];
+			readMap->SetHeight(index, height);
+			heightMapChanged = heightMapChanged || (height != oldHeight);
+		}
+	}
+
+	delete[] fileData;
+
+	if (heightMapChanged) {
+		mapDamage->RecalcArea(fromX, toX, fromZ, toZ);
+	}
+
+	//!clean
 	HeightMapFilePath = filePath;
-	SetHeightMapByBitmap(bitmap, heightBase, heightScale, fromX,fromZ, toX,toZ);
 }
 
 void GetHeightDataFromCurFile(float* destHeightData) {
-	CBitmap bitmap;
-	if (!LoadHeightBitmap(bitmap, HeightMapFilePath.c_str())) return;
+	//!temp
+	std::ifstream file(HeightMapFilePath, std::ios::in | std::ios::binary | std::ios::ate);
+	if (!file.is_open()) return;
 
-	const uint16_t* bitmapData = reinterpret_cast<const uint16_t*>(bitmap.GetRawMem());
-	float* const destHeightDataEnd = destHeightData +(mapDims.mapx+1)*(mapDims.mapy+1);
-	for (; destHeightData != destHeightDataEnd; ++destHeightData, ++bitmapData) {
-		*destHeightData = HeightBase +float(*bitmapData)/65535.0f*HeightScale;
+	size_t size = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	if (size <= (mapDims.mapx+1)*(mapDims.mapy+1)*sizeof(float)) {
+		file.read(reinterpret_cast<char*>(destHeightData), size);
 	}
 }

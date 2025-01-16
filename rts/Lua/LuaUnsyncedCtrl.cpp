@@ -4837,7 +4837,7 @@ int LuaUnsyncedCtrl::Yield(lua_State* L)
 
 
 //!temp
-int LuaUnsyncedCtrl::SetTerrainPhysicalHeightMap(lua_State* L) {
-	SetHeightMapRequisites(luaL_checkstring(L, 1), luaL_checkfloat(L, 2), luaL_checkfloat(L, 3));
+int LuaUnsyncedCtrl::SetGameMapRequisites(lua_State* L) {
+	SetGameMapRequisites_(luaL_checkstring(L, 1));
 	return 0;
 }

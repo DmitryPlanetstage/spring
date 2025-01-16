@@ -5,14 +5,13 @@
 #include "Rendering/Textures/Bitmap.h"
 #include "Map/ReadMap.h"
 
-void SetHeightMapRequisites(const char* heightMapFilePath, float base, float scale);
+//!temp name
+void SetGameMapRequisites_(const char* heightMapFilePath);
 
-void SetHeightMapByBitmap(const CBitmap& bitmap, float heightBase, float heightScale, int fromX, int fromZ, int toX, int toZ);
-inline void SetHeightMapByBitmap(const CBitmap& bitmap, float heightBase, float heightScale)
-	{ SetHeightMapByBitmap(bitmap, heightBase, heightScale, 0,0, mapDims.mapx,mapDims.mapy); };
+void SetHeightMapByBitmap(const CBitmap& bitmap, int fromX, int fromZ, int toX, int toZ);
+inline void SetHeightMapByBitmap(const CBitmap& bitmap) { SetHeightMapByBitmap(bitmap, 0,0, mapDims.mapx,mapDims.mapy); };
 
-void SetHeightMapByFile(const char* filePath, float heightBase, float heightScale, int fromX, int fromZ, int toX, int toZ);
-inline void SetHeightMapByFile(const char* filePath, float heightBase, float heightScale)
-	{ SetHeightMapByFile(filePath, heightBase, heightScale, 0,0, mapDims.mapx,mapDims.mapy); };
+void SetHeightMapByFile(const char* filePath, int fromX, int fromZ, int toX, int toZ);
+inline void SetHeightMapByFile(const char* filePath) { SetHeightMapByFile(filePath, 0,0, mapDims.mapx,mapDims.mapy); };
 
 void GetHeightDataFromCurFile(float* destHeightData);

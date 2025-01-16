@@ -18,9 +18,9 @@ using namespace GL::State;
 
 
 /* Lua */
-void LoadHeightMapFromFile(const char* filePath, float heightBase, float heightScale)
+void LoadHeightMapFromFile(const char* filePath)
 {
-	SetHeightMapByFile(filePath, heightBase, heightScale);
+	SetHeightMapByFile(filePath);
 }
 
 /* Lua */

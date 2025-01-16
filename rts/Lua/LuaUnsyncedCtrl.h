@@ -205,7 +205,7 @@ class LuaUnsyncedCtrl {
 		static int Yield(lua_State* L);
 
 		//!temp
-		static int SetTerrainPhysicalHeightMap(lua_State* L);
+		static int SetGameMapRequisites(lua_State* L);
 };
 
 #endif /* LUA_UNSYNCED_CTRL_H */
