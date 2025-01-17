@@ -106,30 +106,12 @@ void CSMFMapFile::ReadHeightmap(unsigned short* heightmap)
 
 void CSMFMapFile::ReadHeightmap(float* sHeightMap, float* uHeightMap, float base, float mod)
 {
-	const int hmx = header.mapx + 1;
-	const int hmy = header.mapy + 1;
-	const int len = hmx * hmy;
+	assert(sHeightMap);
+	// Height data from a file set via SetGameMapRequisites:
+	GetHeightDataFromSetFile(sHeightMap);
 
-	unsigned short word = 0;
-
-	assert(sHeightMap != nullptr);
-
-	//!clean
-	/*if (uHeightMap == nullptr)
-		uHeightMap = sHeightMap;
-
-	ifs.Seek(header.heightmapPtr);
-
-	for (int i = 0; i < len; ++i) {
-		ifs.Read(&word, sizeof(word));
-
-		sHeightMap[i] = base + swabWord(word) * mod;
-		uHeightMap[i] = sHeightMap[i];
-	}*/
-
-	GetHeightDataFromCurFile(sHeightMap);
 	if (uHeightMap) {
-		std::memcpy(uHeightMap, sHeightMap, len*sizeof(float));
+		std::memcpy(uHeightMap, sHeightMap, (header.mapx+1)*(header.mapy+1)*sizeof(float));
 	}
 }
 

@@ -28,6 +28,19 @@ void SetGameMapRequisites_(const char* heightMapFilePath) {
 	HeightMapFilePath = heightMapFilePath;
 }
 
+void GetHeightDataFromSetFile(float* destHeightData) {
+	//!temp
+	std::ifstream file(HeightMapFilePath, std::ios::in | std::ios::binary | std::ios::ate);
+	if (!file.is_open()) return;
+
+	size_t size = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	if (size <= (mapDims.mapx+1)*(mapDims.mapy+1)*sizeof(float)) {
+		file.read(reinterpret_cast<char*>(destHeightData), size);
+	}
+}
+
 // A bitmap must be 16-bit grayscale
 void SetHeightMapByBitmap(const CBitmap& bitmap, int fromX, int fromZ, int toX, int toZ) {
 	/*if (mapDamage->Disabled()) return;
@@ -62,7 +75,9 @@ void SetHeightMapByFile(const char* filePath, int fromX, int fromZ, int toX, int
 		file.seekg(0, std::ios::beg);
 
 		fileData = new char[size];
-		file.read(fileData, size);
+		if (size <= (mapDims.mapx+1)*(mapDims.mapy+1)*sizeof(float)) {
+			file.read(fileData, size);
+		}
 	}
 
 	float* heights = reinterpret_cast<float*>(fileData);
@@ -85,17 +100,4 @@ void SetHeightMapByFile(const char* filePath, int fromX, int fromZ, int toX, int
 
 	//!clean
 	HeightMapFilePath = filePath;
-}
-
-void GetHeightDataFromCurFile(float* destHeightData) {
-	//!temp
-	std::ifstream file(HeightMapFilePath, std::ios::in | std::ios::binary | std::ios::ate);
-	if (!file.is_open()) return;
-
-	size_t size = file.tellg();
-	file.seekg(0, std::ios::beg);
-
-	if (size <= (mapDims.mapx+1)*(mapDims.mapy+1)*sizeof(float)) {
-		file.read(reinterpret_cast<char*>(destHeightData), size);
-	}
 }
